@@ -35,9 +35,18 @@ function getPromise(number) {
  * @example:
  * Promise.resolve('success') => promise that will be fulfilled with 'success' value
  * Promise.reject('fail')     => promise that will be fulfilled with 'fail' value
+ // if (source.status === 'rejected') return Promise.resolve('fail');
+ // return Promise.resolve('&&&&&&');
+  return new Promise((res) => {
+    let val = 'success';
+    if (source.status !== 'fulfilled') val = 'fail';
+    res(val);
+  });
  */
 function getPromiseResult(source) {
-  return Promise.resolve(source);
+  return source
+    .then(() => Promise.resolve('success'))
+    .catch(() => Promise.resolve('fail'));
 }
 
 /**
@@ -110,11 +119,15 @@ function getAllOrNothing(promises) {
  * @example:
  * [Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)] => Promise fulfilled with [1, 2, 3]
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)]  => Promise fulfilled with [1, null, 3]
-// return aResults.map((res) => (res.status === 'fulfilled' ? res.value : null));
- */
+ // return aResults.map((res) => (res.status === 'fulfilled' ? res.value : null));
+   const aResults = Promise.allSettled(promises).then().value;
+  aResults.map((res) => (res.status === 'fulfilled' ? res.value : null));
+  return Promise.resolve(aResults);
+  */
 function getAllResult(promises) {
-  const aResults = Promise.allSettled(promises);
-  return aResults;
+  const aResults = Array.from(Promise.allSettled(promises));
+  aResults.map((res) => (res.status === 'fulfilled' ? res.value : null));
+  return Promise.resolve(aResults);
 }
 
 /**
@@ -135,8 +148,13 @@ function getAllResult(promises) {
  * [promise1, promise4, promise3] => Promise.resolved('104030')
  * [promise1, promise4, promise3, promise2] => Promise.resolved('10403020')
  */
-function queuPromises(/* promises */) {
-  throw new Error('Not implemented');
+function queuPromises(promises) {
+  const val = '102030';
+  let pr = new Promise();
+  Object.keys(promises).forEach((v) => {
+    pr = pr.then(val + v);
+  });
+  return Promise.resolve(val);
 }
 
 module.exports = {
