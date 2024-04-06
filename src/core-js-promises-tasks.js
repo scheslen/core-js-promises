@@ -125,9 +125,12 @@ function getAllOrNothing(promises) {
   return Promise.resolve(aResults);
   */
 function getAllResult(promises) {
-  const aResults = Array.from(Promise.allSettled(promises));
-  aResults.map((res) => (res.status === 'fulfilled' ? res.value : null));
-  return Promise.resolve(aResults);
+  return Promise.allSettled(promises).then((aResults) => {
+    const arr = aResults.map((res) =>
+      res.status === 'fulfilled' ? res.value : null
+    );
+    return Promise.resolve(arr);
+  });
 }
 
 /**
