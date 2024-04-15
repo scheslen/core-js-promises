@@ -151,13 +151,29 @@ function getAllResult(promises) {
  * [promise1, promise4, promise3] => Promise.resolved('104030')
  * [promise1, promise4, promise3, promise2] => Promise.resolved('10403020')
  */
+
 function queuPromises(promises) {
-  const val = '102030';
-  let pr = new Promise();
-  Object.keys(promises).forEach((v) => {
-    pr = pr.then(val + v);
+  let val = '';
+  const arr = [];
+  arr.length = promises.length;
+
+  let qPr = 0;
+  const prall = new Promise((rrr) => {
+    promises.forEach((pr, i) => {
+      pr.then((res) => {
+        qPr += 1;
+        arr[i] = res;
+        if (qPr === promises.length) rrr();
+      });
+    });
   });
-  return Promise.resolve(val);
+
+  return prall.then(() => {
+    arr.forEach((v) => {
+      val += `${v}`;
+    });
+    return Promise.resolve(val);
+  });
 }
 
 module.exports = {
